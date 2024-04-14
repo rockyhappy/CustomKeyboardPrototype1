@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CustomKeyboardPrototype1</string>
+
+        <string name="mykeyboard">MyKeyboard</string>
+        <string name="enable_keyboard">enable keyboard</string>
+        <string name="choose_keyboard">Choose Keyboard</string>
 </resources>
