@@ -1,28 +1,81 @@
 package com.devrachit.customkeyboardprototype1
 
-import android.content.Context
 import android.inputmethodservice.InputMethodService
 import android.view.KeyEvent
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import com.devrachit.customkeyboardprototype1.R
-import com.devrachit.customkeyboardprototype1.databinding.ActivityMainBinding
+import android.widget.TextView
 import com.devrachit.customkeyboardprototype1.databinding.KeyboardLayoutBinding
+import com.devrachit.customkeyboardprototype1.BuildConfig
+import com.google.ai.client.generativeai.GenerativeModel
 
+//import com.gemini.Gemini
+//import com.gemini.RecommendationListener
 class MyKeyboard : InputMethodService() {
     override fun onCreateInputView(): View {
         val keyboardBinding = KeyboardLayoutBinding.inflate(layoutInflater)
-        
-        // List of button IDs in your layout
+
         val buttonIds = arrayOf(
             R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9, R.id.btn0,
             R.id.btnQ,R.id.btnW,R.id.btnE,R.id.btnR,R.id.btnT,R.id.btnY,R.id.btnU,R.id.btnI,R.id.btnO,R.id.btnP,
             R.id.btnA,R.id.btnS,R.id.btnD,R.id.btnF,R.id.btnG,R.id.btnH,R.id.btnJ,R.id.btnK,R.id.btnL,
             R.id.btnZ,R.id.btnX,R.id.btnC,R.id.btnV,R.id.btnB,R.id.btnN,R.id.btnM,R.id.btnDot,R.id.btnComma
         )
-        
-        for (buttonId in buttonIds) {
+
+        val sample1=keyboardBinding.root.findViewById<TextView>(R.id.sample1)
+        sample1.setOnClickListener {
+            val inputConnection = currentInputConnection
+            inputConnection?.commitText(sample1.text.toString(), 1)
+        }
+        val sample2=keyboardBinding.root.findViewById<TextView>(R.id.sample2)
+        sample2.setOnClickListener {
+            val inputConnection = currentInputConnection
+            inputConnection?.commitText(sample2.text.toString(), 1)
+        }
+        val sample3=keyboardBinding.root.findViewById<TextView>(R.id.sample3)
+        sample3.setOnClickListener {
+            val inputConnection = currentInputConnection
+            inputConnection?.commitText(sample3.text.toString(), 1)
+        }
+
+
+        val generativeModel = GenerativeModel(
+            modelName="gemini-pro",
+            apiKey=BuildConfig.api_key
+        )
+
+        val prompt = "Write a story about a magic backpack."
+
+//        val response = generativeModel.generateContent(prompt)
+//        print(response.text)
+
+//        private val gemini = Gemini.getInstance()
+//        val inputConnection =currentInputConnection
+//        inputConnection?.addTextChangedListener(object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//                // Not needed
+//            }
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                // Request recommendations
+//                gemini.getRecommendations(s.toString(), object : RecommendationListener {
+//                    override fun onRecommendationsReceived(recommendations: List<String>) {
+//                        // Display recommendations in your UI
+//                    }
+//
+//                    override fun onError(error: String) {
+//                        // Handle error
+//                    }
+//                })
+//            }
+//            override fun afterTextChanged(s: Editable?) {
+//                // Not needed
+//            }
+//        })
+
+
+
+
+            for (buttonId in buttonIds) {
             val button = keyboardBinding.root.findViewById<Button>(buttonId)
             button.setOnClickListener {
                 val inputConnection = currentInputConnection
