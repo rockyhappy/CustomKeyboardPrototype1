@@ -5,15 +5,27 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.devrachit.customkeyboardprototype1.databinding.KeyboardLayoutBinding
 import com.devrachit.customkeyboardprototype1.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 //import com.gemini.Gemini
 //import com.gemini.RecommendationListener
 class MyKeyboard : InputMethodService() {
+    private lateinit var keyboardBinding: KeyboardLayoutBinding
+    private val generativeModel = GenerativeModel(
+        modelName = "gemini-pro",
+        apiKey = BuildConfig.api_key
+    )
+    var inputText = " "
     override fun onCreateInputView(): View {
-        val keyboardBinding = KeyboardLayoutBinding.inflate(layoutInflater)
+        keyboardBinding = KeyboardLayoutBinding.inflate(layoutInflater)
+
 
         val buttonIds = arrayOf(
             R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9, R.id.btn0,
@@ -39,40 +51,6 @@ class MyKeyboard : InputMethodService() {
         }
 
 
-        val generativeModel = GenerativeModel(
-            modelName="gemini-pro",
-            apiKey=BuildConfig.api_key
-        )
-
-        val prompt = "Write a story about a magic backpack."
-
-//        val response = generativeModel.generateContent(prompt)
-//        print(response.text)
-
-//        private val gemini = Gemini.getInstance()
-//        val inputConnection =currentInputConnection
-//        inputConnection?.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                // Not needed
-//            }
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                // Request recommendations
-//                gemini.getRecommendations(s.toString(), object : RecommendationListener {
-//                    override fun onRecommendationsReceived(recommendations: List<String>) {
-//                        // Display recommendations in your UI
-//                    }
-//
-//                    override fun onError(error: String) {
-//                        // Handle error
-//                    }
-//                })
-//            }
-//            override fun afterTextChanged(s: Editable?) {
-//                // Not needed
-//            }
-//        })
-
-
 
 
             for (buttonId in buttonIds) {
@@ -93,6 +71,11 @@ class MyKeyboard : InputMethodService() {
         keyboardBinding.btnEnter.setOnClickListener {
             val inputConnection = currentInputConnection
             inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
+            val text=inputConnection?.getTextBeforeCursor(100,0)?.toString()?.trim()
+            if(text!=null){
+                inputText=text.toString()
+                getRecommendations()
+            }
             return@setOnClickListener
         
         }
@@ -100,10 +83,25 @@ class MyKeyboard : InputMethodService() {
         keyboardBinding.btnSpace.setOnClickListener {
             val inputConnection = currentInputConnection
             inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
+            val text=inputConnection?.getTextBeforeCursor(100,0)?.toString()?.trim()
+            if(text!=null){
+                inputText=text.toString()
+                getRecommendations()
+            }
             return@setOnClickListener
         
         }
         return keyboardBinding.root
+    }
+    private fun getRecommendations() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val prompt = "Give me three different suggestion each separated by a space only no other formatting and containing maximum 1 words not more than that which i might say after : ${inputText}"
+            val response = generativeModel.generateContent(prompt)
+            val words = response.text.toString().split(" ")
+            keyboardBinding.sample1.text=words[0]
+            keyboardBinding.sample2.text=words[1]
+            keyboardBinding.sample3.text=words[2]
+        }
     }
     
 }
