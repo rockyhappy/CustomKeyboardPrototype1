@@ -5,17 +5,12 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.devrachit.customkeyboardprototype1.databinding.KeyboardLayoutBinding
-import com.devrachit.customkeyboardprototype1.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-//import com.gemini.Gemini
-//import com.gemini.RecommendationListener
 class MyKeyboard : InputMethodService() {
     private lateinit var keyboardBinding: KeyboardLayoutBinding
     private val generativeModel = GenerativeModel(
